@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 async def send_to_llm(prompt,type_=None):
     # type as too long input makes the mixture model fail -> trying
     client = Groq(
-        api_key="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",
+        # api_key="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",
         # api_key="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",
     # api_key="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"
-    # api_key="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"
+    api_key="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"
+    # api_key="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"
     )
     # if type_=="100-dollar":
     model="llama3-8b-8192"
@@ -442,7 +443,7 @@ def construct_ahp_prompt(data, topic_response, context_response):
         "Then calculate the overall weight (W) and overall score (OS) using the following formula:\n"
         "- W = (BV + ER + D) / 3\n"
         "- OS = W\n\n"
-        "Return the list of stories in the following format:\n\n"
+        "Return the list of stories in the following format (exactly, e.g: it's very important to include the hashtags, indentation,..):\n\n"
         "### Story ID X: <Story Title>\n"
         "- BV: <value>\n"
         "- ER: <value>\n"
@@ -456,12 +457,17 @@ def construct_ahp_prompt(data, topic_response, context_response):
 
 def parse_ahp_stories(completion_text):
     pattern = re.compile(
-        r"### Story ID (\d+): ([^\n]+)\n"
-        r"- BV: (\d+).*\n"
-        r"- ER: (\d+).*\n"
-        r"- D: (\d+).*\n"
-        r"- W: .*?([0-9.]+)\n"
-        r"- OS: ([0-9.]+)"
+        r"### Story ID (\d+):\s*'?(.+?)'?\n"
+        r"- BV: (\d+)"
+        r".*?\n"  # Skip explanation text
+        r"- ER: (\d+)"
+        r".*?\n"
+        r"- D: (\d+)"
+        r".*?\n"
+        r"- W: .*?([0-9.]+)"
+        r".*?\n"
+        r"- OS: ([0-9.]+)",
+        re.DOTALL
     )
 
     prioritized_stories = []

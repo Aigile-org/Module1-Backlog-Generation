@@ -5,13 +5,15 @@ from groq import Groq
 async def send_to_llm(prompt,type_=None):
     # type as too long input makes the mixture model fail -> trying
     client = Groq(
-        api_key="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",
+        # api_key="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",
         # api_key="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"
     # api_key="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"
-    # api_key="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"
+    api_key="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",
+    # api_key="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"
+    # api_key="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"
     )
     # if type_=="100-dollar":
-    model="llama-3.3-70b-versatile"
+    model="llama3-70b-8192"
         # model="llama3-70b-8192"
     # else:
         # model="mixtral-8x7b-32768" 
@@ -27,18 +29,18 @@ async def send_to_llm(prompt,type_=None):
     except AttributeError as e:
         print(f"Error parsing response: {e}")
         return None
-def readFewshotExamples(id):
+def readFewshotExamples(path,id):
 
-    usFile = open("Examples/example_"+id+"_US.txt", "r", encoding="utf8")
+    usFile = open(path+"Examples/example_"+id+"_US.txt", "r", encoding="utf8")
     us = usFile.read()
 
-    exampleRA = open("Examples/example_"+id+"_RA.txt", "r", encoding="utf8")
+    exampleRA = open(path+"Examples/example_"+id+"_RA.txt", "r", encoding="utf8")
     ra = exampleRA.read()
 
-    exampleQA = open("Examples/example_" + id + "_QA.txt", "r", encoding="utf8")
+    exampleQA = open(path+"Examples/example_" + id + "_QA.txt", "r", encoding="utf8")
     qa = exampleQA.read()
 
-    exampleOthers = open("Examples/example_" + id + "_Others.txt", "r", encoding="utf8")
+    exampleOthers = open(path+"Examples/example_" + id + "_Others.txt", "r", encoding="utf8")
     others = exampleOthers.read()
 
     return us, ra, qa, others
@@ -47,12 +49,13 @@ def readInstructionFile(filename):
     content = f.read()
     return content
 def constructeInputPromptForACGeneration(us):
-    usFile, raExample, qaExample, othersExample = readFewshotExamples("1")
-    usFile2, raExample2, qaExample2, othersExample2 = readFewshotExamples("2")
-    usFile3, raExample3, qaExample3, othersExample3 = readFewshotExamples("3")
-    initialContent = readInstructionFile("D:/ComputerEngineering/GP/GPT-4/Instructions/initialSystem.txt")
-    roleInstructions= readInstructionFile("D:/ComputerEngineering/GP/GPT-4/Instructions/Roles.txt")
-    outputFormat = readInstructionFile("D:/ComputerEngineering/GP/GPT-4/Instructions/outputFormat.txt")
+    path="D:/ComputerEngineering/GP/Module1-Backlog-Generation/python scripts/"
+    usFile, raExample, qaExample, othersExample = readFewshotExamples(path,"1")
+    usFile2, raExample2, qaExample2, othersExample2 = readFewshotExamples(path,"2")
+    usFile3, raExample3, qaExample3, othersExample3 = readFewshotExamples(path,"3")
+    initialContent = readInstructionFile(path+"Instructions/initialSystem.txt")
+    roleInstructions= readInstructionFile(path+"Instructions/Roles.txt")
+    outputFormat = readInstructionFile(path+"Instructions/outputFormat.txt")
 
     contextAndRole = [{"role": "system",
                  "content": initialContent + "\n" + outputFormat + "\n" + "Here are role instructions in this activity.\n"  + roleInstructions + "\n"}]

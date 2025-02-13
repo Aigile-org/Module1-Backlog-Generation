@@ -5,8 +5,12 @@ vision="Aligning more than 500 different vendors and API solutions is difficult.
 const data_to_pass_in = vision+mvp;
 
 console.log('Data sent to python script:', data_to_pass_in);
-const python_process = spawner('python',['./main/pipeline_1_generate_user_stories.py', data_to_pass_in]);
-
+const python_process = spawner('python',['D:/ComputerEngineering/GP/Module1-Backlog-Generation/python scripts/main/pipeline_1_generate_user_stories.py',data_to_pass_in]);
+// python_process.stdin.write(data_to_pass_in + "\n");  // Send data via stdin
+// python_process.stdin.end();
 python_process.stdout.on('data', (data) => {
     console.log('Data received from python script:', data.toString());
+});
+python_process.stderr.on('data', (data) => {
+    console.error('Error from python script:', data.toString());
 });
