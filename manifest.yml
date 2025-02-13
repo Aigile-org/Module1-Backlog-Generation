@@ -1,0 +1,34 @@
+modules:
+  jira:backlogAction:
+    - key: jira-project-backlog-generation
+      resource: main
+      render: native
+      title: Backlog Generation
+      resolver:
+        function: resolver
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      actions:
+        - key: show
+          title: Generate Backlog
+          actionType: modal
+          viewportSize: large
+  function:
+    - key: resolver
+      handler: index.handler
+
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs20.x
+  id: ari:cloud:ecosystem::app/bd7f0896-fc62-4c89-9099-e0c6ea5ad04d
+permissions:
+  scopes:
+    - read:board-scope:jira-software
+    - read:issue-details:jira
+  external:
+    fetch:
+      backend:
+        - 'https://api.groq.com'
+
