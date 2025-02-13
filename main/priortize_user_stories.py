@@ -1,0 +1,25 @@
+import sys
+import os
+import asyncio
+# Add the parent directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from helpers.generate_us import (generate_user_stories_with_epics, check_stories_with_framework)
+from helpers.prioritize_us import agents_workflow
+# objective='The goal of the Tampere City RAG (Retrieve and Generate) Application is to create an AI-driven chatbot that answers visitor questions about the Land Use and Construction Act. The chatbot will function in Finnish, both for input questions and output answers. An English version will be considered later. Data Sources The information will be sourced from the following websites, all in Finnish: 1) Link 1: Finnish legislation website containing the Land Use and Construction Act. 2) Link 2: City planning and zoning information for Tampere. 3) Link 3: Information on building permits, and information services in Tampere. Additionally, a relevant FAQ has been provided from the customer for understanding: • https://www.kouvola.fi/asuminen-ja-ymparisto/rakentaminen/rakennusvalvonta/useinkysyttya-pienet-pihalla-tehtavat-tyot-ja-rakennusprojektit/ Technical Approach ▪ Web Scraping: Extract data from the three specified websites. ▪ Translation: Translate the extracted data into English for internal processing (initially, focus on Finnish for the MVP). ▪ Data Structuring: Convert the data into a structured format suitable for use with a Large Language Model (LLM). ▪ Storage: Use a vector database like Pinecone or Qdrant to store the structured data. ▪ LLM Integration: Utilize the structured data to enable the LLM to generate accurate and relevant responses. ▪ Final Deployment: Deploy the AI chatbot on the official Tampere City website (e.g., Tampere.fi). Not now. Example User Questions • Voinko kaataa puun tontiltani?" (Can I cut down a tree from my plot?) • "Entä pensasaita? Tarvitseeko luvan?" (What about a hedge? Need a permit?)'
+vision="Aligning more than 500 different vendors and API solutions is difficult. The current system struggles to manage 500 suppliers, each with different vendors, making it difficult to centralize and compare prices. The complexity of tracking menu costs, resource costs, price changes, and different vendors creates significant challenges. A unified platform is needed to streamline this process, allowing for the extraction and analysis of data from various vendor PDFs. This platform would store the data in a vector format to provide better insights. Nick will provide more PDFs of different vendors to run the experiment smoothly. The current system struggles to manage 500 suppliers, each with different vendors, making it difficult to centralize and compare prices."
+mvp="The MVP aims to develop a chatbot capable of real-time analysis, providing insights into supplier offerings. The final LLM (Large Language Model) assistant will help managers make informed decisions based on cost analysis, ensuring profitable deals. The first phase targets a release date of July 23rd. Technical Approach PDF Extraction: Obtain PDFs from different vendors of each supplier and extract the content. Translation: Translate the extracted data into English for internal processing. Data Structuring: Convert the data into a structured format suitable for use with a Large Language Model (LLM). Storage: Store the structured data in a vector database like MongoDB. LLM Integration: Utilize the structured data to enable the LLM to generate accurate and relevant responses through well-crafted prompts or queries. Demo: Aim to deliver a functional demo by the third week of July. Use Cases or Query Prompts Ingredient Requirement for Lasagna: Determine the required ingredients and their quantities for making 10 dishes of lasagna, along with the current rates. Supplier Rate Comparison for Pasta: Identify which supplier offers the best rates and deals for making pasta this month. Recipe and Cost Analysis for Lasagna: Retrieve the recipe for lasagna, list all necessary ingredients, and calculate the cost of preparing 20 plates for the next day. Future Prospects API Development: Provide APIs for the team to upload PDFs and perform detailed insights on historical data and various offers. Enhanced Data Analysis: Enable deeper analysis of historical data and trends to optimize procurement and cost management. This approach ensures a streamlined process for managing supplier data, facilitating better decision-making through advanced data analysis and LLM integration."
+# user_stories=generate_user_stories_with_epics(vision=vision,mvp=mvp)
+# # Define the output file path
+# output_file = "user_stories.py"
+# # Write user stories as a Python dictionary to a file
+# with open(output_file, "w") as file:
+#     file.write("user_stories = ")
+#     file.write(repr(user_stories))
+# Import the user_stories variable from the file
+# from user_stories import user_stories
+# while True:
+#     try:
+#         priortized_us=asyncio.run( agents_workflow(user_stories,"AHP"))
+#         break
+#     except AttributeError as e:    
+#         print(f"Error parsing response: {e}")
