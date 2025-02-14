@@ -21,6 +21,7 @@ resolver.define('askGPT', async ({ payload }) => {
     if (!response.ok) {
       throw new Error(`Error: ${response.status} - ${response.statusText}`);
     }
+    console.log(response.json())
 
     const data = await response.json();
     return data;
