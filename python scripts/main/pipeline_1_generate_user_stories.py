@@ -65,10 +65,29 @@ async def pipeline(req):
     print(json.dumps(priortized_us, indent=4),flush=True)
     return priortized_us
 
-input = sys.argv[1]
-output = asyncio.run(pipeline(input))
+# input = sys.argv[1]
+# output = asyncio.run(pipeline(input))
 # print(output)
 # sys.stdout.flush()
+
+from flask import Flask, request, jsonify
+from user_stories import user_stories
+app = Flask(__name__)
+
+@app.route('/run-python', methods=['POST'])
+def run_python():
+    try:
+        data = request.get_json()
+        result = user_stories 
+        print(data['body'])
+        return jsonify({"result": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == '__main__':
+    app.run(port=5000)
+
 
 
 
