@@ -6,11 +6,13 @@ logger = logging.getLogger(__name__)
 async def send_to_llm(prompt,type_=None):
     # type as too long input makes the mixture model fail -> trying
     client = Groq(
-        # api_key="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",
-        # api_key="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",
-    # api_key="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"
-    # api_key="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"
-    api_key="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"
+        # Some of these are perhibted
+    #     # api_key="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",
+    #     # api_key="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",
+    # # api_key="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"
+    # # api_key="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"
+    # api_key="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"
+    api_key="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"
     )
     # if type_=="100-dollar":
     model="llama3-8b-8192"
