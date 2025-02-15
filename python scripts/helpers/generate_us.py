@@ -2,7 +2,7 @@ from g4f.client import Client
 import sys
 import asyncio
 import re
-from groq import Groq
+# from groq import Groq
 import os
 import json
 import os

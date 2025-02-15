@@ -120,7 +120,7 @@ def priortize_us():
         while True:
             try:
                 priortized_us = loop.run_until_complete(
-                    agents_workflow(user_stories, "AHP")
+                    agents_workflow(user_stories, "100_DOLLAR")
                 )
                 break
             except AttributeError as e:

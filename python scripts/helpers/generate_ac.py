@@ -1,4 +1,6 @@
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
+from transformers import AutoModel, AutoTokenizer
+import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from groq import Groq
 
@@ -177,16 +179,26 @@ def AppendingStoriesFromCUU(acceptance_criterias):
             continue
     return all_output
 
+def get_bert_embedding(text):
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
 def checkSimilarity(sen1, sen2):
     # Encode the sentences into embeddings
-    embeddings = model.encode([sen1, sen2])
+    emb1 = get_bert_embedding(sen1).reshape(1, -1)  # Reshape to 2D for sklearn
+    emb2 = get_bert_embedding(sen2).reshape(1, -1)
     
     # Calculate cosine similarity
-    score = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    score = cosine_similarity(emb1,emb2)[0][0]
     
     return score
 # Load the pre-trained sentence transformer model (BERT-based)
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# model = SentenceTransformer('all-MiniLM-L6-v2')
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
 def filterSimilarAC(ac, ratio):
     finalAC = []
     for i in ac:
