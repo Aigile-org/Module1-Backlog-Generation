@@ -9,8 +9,8 @@ async def send_to_llm(prompt,type_=None):
         # api_key="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",
         # api_key="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",
     # api_key="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"
-    api_key="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"
-    # api_key="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"
+    # api_key="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"
+    api_key="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"
     )
     # if type_=="100-dollar":
     model="llama3-8b-8192"
@@ -440,7 +440,7 @@ def construct_ahp_prompt(data, topic_response, context_response):
         "- Business Value (BV): The importance of this story to the business or stakeholders.\n"
         "- Effort Required (ER): The amount of effort needed to complete this story.\n"
         "- Dependencies (D): The extent to which this story depends on other factors or stories.\n\n"
-        "Then calculate the overall weight (W) and overall score (OS) using the following formula:\n"
+        "Then calculate the overall weight (W) and overall score (OS) using the following formula(carefully check that W is calculated exactly):\n"
         "- W = (BV + ER + D) / 3\n"
         "- OS = W\n\n"
         "Return the list of stories in the following format (exactly, e.g: it's very important to include the hashtags, indentation,..):\n\n"
@@ -481,8 +481,8 @@ def parse_ahp_stories(completion_text):
             "BV": int(bv),
             "ER": int(er),
             "D": int(d),
-            "W": float(weight),
-            "OS": float(os),
+            "W": round((int(bv) + int(er) + int(d)) / 3,3),
+            "OS": round((int(bv) + int(er) + int(d)) / 3,3),
         })
 
     # Sort the stories by overall score in descending order

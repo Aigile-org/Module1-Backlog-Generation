@@ -5,10 +5,10 @@ from groq import Groq
 async def send_to_llm(prompt,type_=None):
     # type as too long input makes the mixture model fail -> trying
     client = Groq(
-        # api_key="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",
+        api_key="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",
         # api_key="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"
     # api_key="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"
-    api_key="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",
+    # api_key="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",
     # api_key="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"
     # api_key="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"
     )
