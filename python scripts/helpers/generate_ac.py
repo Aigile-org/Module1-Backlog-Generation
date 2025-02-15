@@ -50,7 +50,7 @@ def readInstructionFile(filename):
     content = f.read()
     return content
 def constructeInputPromptForACGeneration(us):
-    path="D:/ComputerEngineering/GP/Module1-Backlog-Generation/python scripts/"
+    path="D:/Menna/Module1-Backlog-Generation/python scripts/"
     usFile, raExample, qaExample, othersExample = readFewshotExamples(path,"1")
     usFile2, raExample2, qaExample2, othersExample2 = readFewshotExamples(path,"2")
     usFile3, raExample3, qaExample3, othersExample3 = readFewshotExamples(path,"3")

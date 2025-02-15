@@ -1,88 +1,249 @@
-{
-    "result": [
-      {
-        "description": "The system should be able to extract specific content from the uploaded PDFs, including tables, text, and images, and store it in a structured format for further processing. The extraction process should be able to handle different formats, such as invoices, catalogues, and reports.",
-        "dollar_allocation": 20,
-        "epic": "PDF Extraction",
-        "key": 1,
-        "user_story": "As a supplier data extractor, I want to be able to extract content from vendor PDFs, in order to obtain necessary information for data analysis."
-      },
-      {
-        "description": "The system should allow users to upload PDFs from various suppliers, validate their format, and extract relevant data such as product names, prices, and quantities. The extracted data should be stored in a structured format for further processing.",
-        "dollar_allocation": 14,
-        "epic": "PDF Extraction",
-        "key": 0,
-        "user_story": "As a supplier data extractor, I want to be able to upload vendor PDFs, in order to extract important information for further processing."
-      },
-      {
-        "description": "The system should be able to convert the extracted data into a structured format, such as JSON or CSV, for efficient data analysis and processing. The structured data should be easily accessible and manipulable for further analysis and reporting.",
-        "dollar_allocation": 13,
-        "epic": "Data Structuring",
-        "key": 4,
-        "user_story": "As a data structurer, I want to convert extracted data into a structured format, in order to enable efficient data analysis and processing."
-      },
-      {
-        "description": "The system should be able to translate extracted data from various languages into English for internal processing and analysis. The translation process should be accurate and reliable, ensuring that the data can be used for business decisions.",
-        "dollar_allocation": 12,
-        "epic": "Translation",
-        "key": 3,
-        "user_story": "As a translation module, I want to translate extracted data into English, in order to facilitate internal processing and analysis."
-      },
-      {
-        "description": "The system should be able to use the structured data to enable the LLM to generate accurate and relevant responses, providing valuable insights and recommendations to managers. The LLM should be able to analyze the data and provide intuitive and actionable recommendations.",
-        "dollar_allocation": 10,
-        "epic": "LLM Integration",
-        "key": 7,
-        "user_story": "As an LLM integration module, I want to use structured data to enable the LLM to generate accurate and relevant responses, in order to provide valuable insights and recommendations to managers."
-      },
-      {
-        "description": "The system should allow users to select specific sections or pages from the uploaded PDFs to extract, reducing unnecessary data and improving processing efficiency. This should help to reduce data volume and improve data quality.",
-        "dollar_allocation": 8,
-        "epic": "PDF Extraction",
-        "key": 2,
-        "user_story": "As a supplier data extractor, I want to be able to select specific sections of a vendor PDF to extract, in order to reduce unnecessary data and improve processing efficiency."
-      },
-      {
-        "description": "The system should be able to store the structured data in a vector database like MongoDB, enabling fast and efficient data retrieval and analysis. The storage process should be scalable and secure, ensuring that the data is safe and accessible.",
-        "dollar_allocation": 8,
-        "epic": "Storage",
-        "key": 6,
-        "user_story": "As a data storage module, I want to store structured data in a vector database like MongoDB, in order to enable fast and efficient data retrieval and analysis."
-      },
-      {
-        "description": "The system should be able to develop an API for uploading PDFs and performing detailed insights, unlocking advanced data analysis and LLM integration. The API should be scalable and secure, enabling seamless integration with various systems and tools.",
-        "dollar_allocation": 6,
-        "epic": "Future Prospects",
-        "key": 10,
-        "user_story": "As a future developer, I want to develop an API for uploading PDFs and performing detailed insights, in order to unlock advanced data analysis and LLM integration."
-      },
-      {
-        "description": "The system should be able to validate the extracted data against a predefined schema, ensuring that the data is consistent and of high quality. This should help to reduce data errors and inconsistencies.",
-        "dollar_allocation": 5,
-        "epic": "Data Structuring",
-        "key": 5,
-        "user_story": "As a data structurer, I want to validate extracted data against a predefined schema, in order to ensure data consistency and quality."
-      },
-      {
-        "description": "The system should be able to provide a functional demo by the third week of July, showcasing the system's capabilities and features. The demo should include use cases such as ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna.",
-        "dollar_allocation": 3,
-        "epic": "Demo and Use Cases",
-        "key": 8,
-        "user_story": "As a demo developer, I want to develop a functional demo by the third week of July, in order to showcase the system's capabilities and features."
-      },
-      {
-        "description": "The system should be able to develop use cases for the demo, including ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna. These use cases should demonstrate the system's capabilities and features, showcasing its value and potential.",
-        "dollar_allocation": 3,
-        "epic": "Demo and Use Cases",
-        "key": 9,
-        "user_story": "As a use case developer, I want to develop use cases for ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna, in order to demonstrate the system's capabilities and features."
-      },
-      {
-        "description": "The system should be able to develop enhanced data analysis to optimize procurement and cost management, providing valuable insights and recommendations to managers. The enhanced data analysis should be able to analyze large datasets and provide actionable recommendations.",
-        "dollar_allocation": 0,
-        "epic": "Future Prospects",
-        "key": 11,
-        "user_story": "As a future developer, I want to develop enhanced data analysis to optimize procurement and cost management, in order to provide valuable insights and recommendations to managers."
-      }
-    ]
+[
+  {
+    "ac": [
+      "The system should be able to read and parse PDF files from various vendors.",
+      "The system should be able to extract relevant content from PDF files, including but not limited to: product descriptions, prices, and product codes.",
+      "The system should be able to handle different PDF file formats and structures from various vendors.",
+      "The system should be able to extract data from PDF files with accuracy, precision, and completeness.",
+      "The system should provide a user-friendly interface for the supplier data extractor to upload PDF files and review the extracted content.",
+      "The system should provide options for the supplier data extractor to correct or modify the extracted content if necessary.",
+      "The system should store the extracted content in a structured format suitable for data analysis.",
+      "The system should be able to handle large volumes of PDF files and extract content without performance degradation.",
+      "The system should be able to handle PDF files with different character encodings and fonts.",
+      "The system should provide logging and error handling mechanisms to track and resolve any issues that occur during the extraction process.",
+      "The system should have version control to track changes made to the extracted content.",
+      "The system should have a reporting feature to provide summary statistics on the extraction process, such as success rate, error rate, and extraction time."
+    ],
+    "description": "The system should be able to extract specific content from the uploaded PDFs, including tables, text, and images, and store it in a structured format for further processing. The extraction process should be able to handle different formats, such as invoices, catalogues, and reports.",
+    "dollar_allocation": 20,
+    "epic": "PDF Extraction",
+    "key": 1,
+    "user_story": "As a supplier data extractor, I want to be able to extract content from vendor PDFs, in order to obtain necessary information for data analysis."
+  },
+  {
+    "ac": [
+      "The application provides a user-friendly interface for uploading PDF files.",
+      "The system supports PDF files up to a maximum size of 10MB.",
+      "The system allows the upload of multiple PDF files at once.",
+      "The system validates the PDF file format and rejects any non-PDF files.",
+      "The system displays a progress bar or indicator during the upload process.",
+      "The system provides a success message or indicator after a successful upload.",
+      "The system extracts relevant information (e.g. vendor name, invoice number, date, etc.) from the uploaded PDF files.",
+      "The extracted information is stored in a structured format (e.g. database, spreadsheet, etc.) for further processing.",
+      "The system handles errors and exceptions correctly, such as invalid or corrupted PDF files, and provides a meaningful error message to the user.",
+      "The system performs data validation on the extracted information, such as date and numeric fields, to ensure the data is accurate and consistent.",
+      "The system provides logging and auditing capabilities to track and monitor the upload and extraction process.",
+      "The system stores the uploaded PDF files in a secure and version-controlled repository.",
+      "The system generates a unique identifier for each uploaded PDF file and associates it with the extracted information."
+    ],
+    "description": "The system should allow users to upload PDFs from various suppliers, validate their format, and extract relevant data such as product names, prices, and quantities. The extracted data should be stored in a structured format for further processing.",
+    "dollar_allocation": 14,
+    "epic": "PDF Extraction",
+    "key": 0,
+    "user_story": "As a supplier data extractor, I want to be able to upload vendor PDFs, in order to extract important information for further processing."
+  },
+  {
+    "ac": [
+      "The system should be able to convert extracted data from various sources (e.g. CSV, JSON, XML) into a structured format (e.g. relational database, data warehouse).",
+      "The converted data should be organized into defined tables, with each table having clear and descriptive column names.",
+      "The system should handle data types correctly, ensuring that numeric, date, and string data are stored in appropriate formats.",
+      "The system should perform data validation checks to ensure that data is cleansed and formatted correctly.",
+      "The system should provide a way to handle errors and exceptions during the conversion process, such as logging and notification mechanisms.",
+      "The system should be able to handle large volumes of data and perform conversions efficiently, without significant performance degradation.",
+      "The system should log and report any data quality issues or warnings during the conversion process, including data truncation, invalid data formats, or missing data.",
+      "The system should provide a way to audit and track changes to the converted data, including versioning and history of changes.",
+      "The system should be able to handle large datasets and perform data conversion within a reasonable timeframe (e.g. < 1 hour).",
+      "The system should be compatible with the existing data analytics and reporting tools to ensure seamless integration."
+    ],
+    "description": "The system should be able to convert the extracted data into a structured format, such as JSON or CSV, for efficient data analysis and processing. The structured data should be easily accessible and manipulable for further analysis and reporting.",
+    "dollar_allocation": 13,
+    "epic": "Data Structuring",
+    "key": 4,
+    "user_story": "As a data structurer, I want to convert extracted data into a structured format, in order to enable efficient data analysis and processing."
+  },
+  {
+    "ac": [
+      "The translation module should be able to receive extracted data in various languages as input.",
+      "The module should be able to translate the input data into English with a minimum accuracy of 90%.",
+      "The translation module should support translation of data in multiple formats, including but not limited to, CSV, JSON, and XML.",
+      "The module should be able to handle data with special characters, punctuation, and formatting.",
+      "The translated data should be in a format compatible with internal systems for processing and analysis.",
+      "The module should be able to handle large volumes of data and perform translations within a reasonable timeframe (e.g. < 1 hour for 1000 records).",
+      "The module should provide logging and error handling mechanisms to detect and report any translation errors or failures.",
+      "The module should be tested with a diverse set of languages and data formats to ensure consistency and accuracy of translations.",
+      "The module should be integrated with the existing data pipeline and extract-transform-load (ETL) process.",
+      "The translation process should be scalable and able to handle large volumes of data without significant performance degradation."
+    ],
+    "description": "The system should be able to translate extracted data from various languages into English for internal processing and analysis. The translation process should be accurate and reliable, ensuring that the data can be used for business decisions.",
+    "dollar_allocation": 12,
+    "epic": "Translation",
+    "key": 3,
+    "user_story": "As a translation module, I want to translate extracted data into English, in order to facilitate internal processing and analysis."
+  },
+  {
+    "ac": [
+      "The LLM integration module can ingest and process structured data from various sources such as JSON, CSV, and XML.",
+      "The module can extract relevant information from the structured data and convert it into a format that is compatible with the LLM.",
+      "The LLM generates responses that are accurate and relevant to the input data, as measured by a precision and recall rate of at least 90%.",
+      "The module can handle large volumes of data and generate responses in a timely manner, with a latency of no more than 5 seconds.",
+      "The module provides a clear and concise response format that is easy for managers to understand and act upon.",
+      "The module integrates with the LLM to provide personalized and contextualized responses based on the input data.",
+      "The module handles edge cases and invalid data inputs gracefully, providing appropriate error messages and logging for debugging purposes.",
+      "The module is integrated with a testing framework to ensure regression testing and continuous validation of the LLM's response accuracy.",
+      "The module's performance is monitored and logged to identify areas for optimization and improvement.",
+      "The integration module is compatible with the existing infrastructure and technology stack of the organization.",
+      "The module meets the security and compliance requirements of the organization, ensuring the confidentiality and integrity of the data.",
+      "The module is scalable and can handle increased volumes of data and traffic without impacting performance."
+    ],
+    "description": "The system should be able to use the structured data to enable the LLM to generate accurate and relevant responses, providing valuable insights and recommendations to managers. The LLM should be able to analyze the data and provide intuitive and actionable recommendations.",
+    "dollar_allocation": 10,
+    "epic": "LLM Integration",
+    "key": 7,
+    "user_story": "As an LLM integration module, I want to use structured data to enable the LLM to generate accurate and relevant responses, in order to provide valuable insights and recommendations to managers."
+  },
+  {
+    "ac": [
+      "The application provides a user interface to select specific sections of a vendor PDF for extraction.",
+      "The user can visually identify and select specific sections (e.g. tables, images, text) of the PDF document.",
+      "The application allows the user to preview the selected sections before extraction.",
+      "The application extracts only the selected sections of the PDF document, excluding unnecessary data.",
+      "The extracted data is formatted correctly and accurately represents the original PDF content.",
+      "The application provides an option to save the selection criteria for future extractions.",
+      "The application handles PDFs with different layouts, orientations, and fonts without distorting the extracted data.",
+      "The application can extract data from PDFs with various security settings, such as password-protected or encrypted files.",
+      "The application performs error handling for scenarios where the selected sections cannot be extracted (e.g., layout issues, corrupted files).",
+      "The application provides metrics to measure the extraction accuracy and efficiency, such as extraction time and success rate.",
+      "The saved selection criteria are version-controlled, allowing tracking of changes and rollbacks if needed.",
+      "The application integrates with the existing data processing pipeline, ensuring seamless data integration and processing."
+    ],
+    "description": "The system should allow users to select specific sections or pages from the uploaded PDFs to extract, reducing unnecessary data and improving processing efficiency. This should help to reduce data volume and improve data quality.",
+    "dollar_allocation": 8,
+    "epic": "PDF Extraction",
+    "key": 2,
+    "user_story": "As a supplier data extractor, I want to be able to select specific sections of a vendor PDF to extract, in order to reduce unnecessary data and improve processing efficiency."
+  },
+  {
+    "ac": [
+      "The data storage module is able to store structured data in a MongoDB database.",
+      "The data is stored in a correct and valid MongoDB collection and document structure.",
+      "The data storage module is able to handle high volumes of data and scale horizontally to meet the growing needs of the application.",
+      "The data storage module provides a mechanism for indexing and querying the data to enable fast and efficient data retrieval.",
+      "The data storage module supports data aggregation and grouping operations to enable efficient data analysis.",
+      "The data storage module provides a mechanism for data backups and recoveries to ensure data integrity and availability.",
+      "Performance testing should be conducted to measure the data storage module's ability to handle high volumes of data and scale horizontally.",
+      "Error handling and logging mechanisms should be in place to handle unexpected errors or exceptions during data storage and retrieval operations.",
+      "Security testing should be conducted to ensure that the data storage module properly authenticates and authorizes access to the MongoDB database.",
+      "The data storage module is compatible with the existing CI/CD pipeline and does not introduce any infrastructure or deployment issues.",
+      "The data storage module adheres to the security and compliance policies of the organization, including data encryption and access controls."
+    ],
+    "description": "The system should be able to store the structured data in a vector database like MongoDB, enabling fast and efficient data retrieval and analysis. The storage process should be scalable and secure, ensuring that the data is safe and accessible.",
+    "dollar_allocation": 8,
+    "epic": "Storage",
+    "key": 6,
+    "user_story": "As a data storage module, I want to store structured data in a vector database like MongoDB, in order to enable fast and efficient data retrieval and analysis."
+  },
+  {
+    "ac": [
+      "The API endpoint for uploading PDFs is implemented and accepts multi-part form data.",
+      "The API returns a unique identifier for the uploaded PDF, which can be used for further processing.",
+      "The API validates the uploaded file type and size, and returns an error message if the file is not a valid PDF or exceeds the maximum allowed size.",
+      "The API performs OCR (Optical Character Recognition) on the uploaded PDF and extracts text data.",
+      "The API provides an endpoint for retrieving the extracted text data, which includes metadata such as page numbers, font sizes, and styles.",
+      "The API integrates with LLM (Large Language Model) for advanced data analysis, such as sentiment analysis, entity recognition, and topic modeling.",
+      "The API provides an endpoint for retrieving the detailed insights generated by the LLM, including visualizations and metrics.",
+      "The API is tested for compatibility with different PDF versions and formats (e.g. PDF/A, PDF/E).",
+      "The API is tested for performance and scalability, handling a large volume of concurrent uploads and requests.",
+      "The API returns a comprehensive error message with debugging information when an error occurs during upload, OCR, or LLM processing.",
+      "The API performs data validation and sanitization to prevent potential security vulnerabilities.",
+      "The API is secure and encrypts sensitive data, such as API keys and user credentials.",
+      "The API is implemented with proper authentication and authorization mechanisms to ensure secure access and data protection.",
+      "The API documentation is clear, concise, and easily accessible, including code samples and examples for easy integration."
+    ],
+    "description": "The system should be able to develop an API for uploading PDFs and performing detailed insights, unlocking advanced data analysis and LLM integration. The API should be scalable and secure, enabling seamless integration with various systems and tools.",
+    "dollar_allocation": 6,
+    "epic": "Future Prospects",
+    "key": 10,
+    "user_story": "As a future developer, I want to develop an API for uploading PDFs and performing detailed insights, in order to unlock advanced data analysis and LLM integration."
+  },
+  {
+    "ac": [
+      "The system validates extracted data against a predefined schema before importing it into the database.",
+      "The validation process checks for data types, length, and format consistency against the schema definition.",
+      "The system raises an error or warning when invalid or inconsistent data is detected during validation.",
+      "The system provides a report or log of validation results, including details of any errors or warnings.",
+      "The system allows for configuration of the validation rules and schema definitions.",
+      "The system supports different data formats such as CSV, JSON, and XML for validation.",
+      "The system handles large datasets efficiently, without significant performance degradation.",
+      "The system performs validation in a reasonable timeframe, meeting the specified threshold for data processing.",
+      "The system is compatible with different versions of the schema, allowing for backwards compatibility and support for future changes.",
+      "The system integrates with the existing ETL (Extract, Transform, Load) process to ensure seamless data pipeline operation."
+    ],
+    "description": "The system should be able to validate the extracted data against a predefined schema, ensuring that the data is consistent and of high quality. This should help to reduce data errors and inconsistencies.",
+    "dollar_allocation": 5,
+    "epic": "Data Structuring",
+    "key": 5,
+    "user_story": "As a data structurer, I want to validate extracted data against a predefined schema, in order to ensure data consistency and quality."
+  },
+  {
+    "ac": [
+      "The demo developer delivers a functional demo by the third week of July.",
+      "The demo includes all major features and functionalities agreed upon by the stakeholders.",
+      "The demo is complete with a user interface that is intuitive and easy to use.",
+      "The demo demonstrate the system's capabilities and features as outlined in the project scope.",
+      "The demo is able to be run on a specified set of hardware and software configurations.",
+      "The demo includes a set of sample data that showcases the system's capabilities.",
+      "The demo is reviewed and approved by the project stakeholders before the third week of July.",
+      "The demo is tested for usability, compatibility, and performance to ensure it meets the required standards.",
+      "The demo should be free from critical defects that can impact the demo's functionality or usability.",
+      "The demo should include clear and concise instructions for the stakeholders to use and review the demo.",
+      "The demo is version-controlled and checked into the project's repository.",
+      "The demo is compatible with the latest browser versions and operating systems.",
+      "The demo includes documentation on how to set up and run the demo."
+    ],
+    "description": "The system should be able to provide a functional demo by the third week of July, showcasing the system's capabilities and features. The demo should include use cases such as ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna.",
+    "dollar_allocation": 3,
+    "epic": "Demo and Use Cases",
+    "key": 8,
+    "user_story": "As a demo developer, I want to develop a functional demo by the third week of July, in order to showcase the system's capabilities and features."
+  },
+  {
+    "ac": [
+      "The system should allow the development of use cases for ingredient requirements and rates for lasagna, including data entry and calculation of total cost.",
+      "The system should enable the comparison of supplier rates for pasta, including data visualization and ranking of suppliers by price.",
+      "The system should provide a recipe and cost analysis for lasagna, including a breakdown of ingredient costs and total recipe cost.",
+      "The system should allow the use cases to be easily customized and modified to accommodate different ingredients, suppliers, and recipes.",
+      "The system should provide reports and dashboards to display the results of the use cases, including charts, tables, and other visualizations.",
+      "The system should handle invalid or missing data inputs, such as incorrect ingredient quantities or supplier rate data, and provide error messages or warnings to the user.",
+      "The system should perform calculations accurately and consistently, including calculations of total cost, ingredient costs, and supplier rates.",
+      "The system should be able to handle multiple use cases and scenarios, and provide consistent and accurate results across different inputs and scenarios.",
+      "The system should be compatible with the latest version of Chrome, Firefox, and Edge browsers.",
+      "The system should have a clear and concise user manual or guide that outlines the steps for developing use cases, comparing supplier rates, and analyzing recipe costs.",
+      "The system should have adequate version control to track changes made to the use cases and recipes, and allow for easy rollback to previous versions if needed."
+    ],
+    "description": "The system should be able to develop use cases for the demo, including ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna. These use cases should demonstrate the system's capabilities and features, showcasing its value and potential.",
+    "dollar_allocation": 3,
+    "epic": "Demo and Use Cases",
+    "key": 9,
+    "user_story": "As a use case developer, I want to develop use cases for ingredient requirements and rates for lasagna, supplier rate comparison for pasta, and recipe and cost analysis for lasagna, in order to demonstrate the system's capabilities and features."
+  },
+  {
+    "ac": [
+      "The system should be able to integrate with existing data sources (e.g. procurement systems, cost management systems) to collect and analyze relevant data.",
+      "The system should provide a dashboard to visualize key performance indicators (KPIs) such as procurement costs, cost savings, and supplier performance.",
+      "The system should have the ability to generate reports and recommendations based on the analysis of procurement data.",
+      "The system should allow users to filter and drill down into the data to analyze specific procurement categories, suppliers, or time periods.",
+      "The system should provide alerts and notifications for abnormal procurement patterns or cost anomalies.",
+      "The system should have data validation and quality checks to ensure accuracy and reliability of the analysis.",
+      "The system should be able to handle large volumes of data without performance degradation.",
+      "The system should have a robust testing framework to ensure the accuracy of the analysis and reports.",
+      "The system should be able to integrate with various data formats and sources, including CSV, Excel, and API integrations.",
+      "The system should follow the established coding standards and best practices to ensure maintainability, scalability, and reusability of the code.",
+      "The system should be compatible with different browsers and devices to ensure accessibility and usability."
+    ],
+    "description": "The system should be able to develop enhanced data analysis to optimize procurement and cost management, providing valuable insights and recommendations to managers. The enhanced data analysis should be able to analyze large datasets and provide actionable recommendations.",
+    "dollar_allocation": 0,
+    "epic": "Future Prospects",
+    "key": 11,
+    "user_story": "As a future developer, I want to develop enhanced data analysis to optimize procurement and cost management, in order to provide valuable insights and recommendations to managers."
   }
+]
