@@ -12,7 +12,6 @@ from helpers.generate_us import (
 from helpers.prioritize_us import agents_workflow
 from helpers.generate_ac import *
 from generate_acceptance_criteria import *
-from g4f.client import Client
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -60,7 +59,7 @@ async def pipeline(req):
     # 3. Prioritize User Stories
     while True:
         try:
-            priortized_us = await agents_workflow(user_stories, "AHP")
+            priortized_us = await agents_workflow(user_stories, "100_DOLLAR")
             break
         except AttributeError as e:
             print(f"Error parsing response: {e}")
