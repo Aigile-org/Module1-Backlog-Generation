@@ -13,7 +13,8 @@ from helpers.prioritize_us import agents_workflow
 from helpers.generate_ac import *
 from generate_acceptance_criteria import *
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # objective='The goal of the Tampere City RAG (Retrieve and Generate) Application is to create an AI-driven chatbot that answers visitor questions about the Land Use and Construction Act. The chatbot will function in Finnish, both for input questions and output answers. An English version will be considered later. Data Sources The information will be sourced from the following websites, all in Finnish: 1) Link 1: Finnish legislation website containing the Land Use and Construction Act. 2) Link 2: City planning and zoning information for Tampere. 3) Link 3: Information on building permits, and information services in Tampere. Additionally, a relevant FAQ has been provided from the customer for understanding: • https://www.kouvola.fi/asuminen-ja-ymparisto/rakentaminen/rakennusvalvonta/useinkysyttya-pienet-pihalla-tehtavat-tyot-ja-rakennusprojektit/ Technical Approach ▪ Web Scraping: Extract data from the three specified websites. ▪ Translation: Translate the extracted data into English for internal processing (initially, focus on Finnish for the MVP). ▪ Data Structuring: Convert the data into a structured format suitable for use with a Large Language Model (LLM). ▪ Storage: Use a vector database like Pinecone or Qdrant to store the structured data. ▪ LLM Integration: Utilize the structured data to enable the LLM to generate accurate and relevant responses. ▪ Final Deployment: Deploy the AI chatbot on the official Tampere City website (e.g., Tampere.fi). Not now. Example User Questions • Voinko kaataa puun tontiltani?" (Can I cut down a tree from my plot?) • "Entä pensasaita? Tarvitseeko luvan?" (What about a hedge? Need a permit?)'
 vision = "Aligning more than 500 different vendors and API solutions is difficult. The current system struggles to manage 500 suppliers, each with different vendors, making it difficult to centralize and compare prices. The complexity of tracking menu costs, resource costs, price changes, and different vendors creates significant challenges. A unified platform is needed to streamline this process, allowing for the extraction and analysis of data from various vendor PDFs. This platform would store the data in a vector format to provide better insights. Nick will provide more PDFs of different vendors to run the experiment smoothly. The current system struggles to manage 500 suppliers, each with different vendors, making it difficult to centralize and compare prices."
@@ -59,7 +60,7 @@ async def pipeline(req):
     # 3. Prioritize User Stories
     while True:
         try:
-            priortized_us = await agents_workflow(user_stories, "100_DOLLAR")
+            priortized_us = await agents_workflow(user_stories, "AHP")
             break
         except AttributeError as e:
             print(f"Error parsing response: {e}")
@@ -89,7 +90,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/generate-us", methods=["POST"])
+@app.route("/generate_and_priortize_us", methods=["POST"])
 def generate_us():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -98,11 +99,19 @@ def generate_us():
         req = data["body"]
         print(data["body"])
         req_refined = loop.run_until_complete(refine_text(req))
-        print("req_refined", req_refined)  # 1. Generate User Stories
+        print("req_refined", req_refined)  
         user_stories = loop.run_until_complete(
             generate_user_stories_with_epics(req=req_refined)
         )
-        result = user_stories
+        while True:
+            try:
+                priortized_us = loop.run_until_complete(
+                    agents_workflow(user_stories, "100_DOLLAR")
+                )
+                break
+            except AttributeError as e:
+                print(f"Error parsing response: {e}")
+        result = priortized_us
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -116,18 +125,14 @@ def priortize_us():
         data = request.get_json()
         user_stories = data["body"]
         print(data["body"])
-        while True:
-            try:
-                priortized_us = loop.run_until_complete(
-                    agents_workflow(user_stories, "100_DOLLAR")
-                )
-                break
-            except AttributeError as e:
-                print(f"Error parsing response: {e}")
+       
         result = priortized_us
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# generate acccc
 
 
 @app.route("/generate-ac", methods=["POST"])
@@ -148,6 +153,25 @@ def generate_ac():
                 AppendingStoriesFromCUU(acceptance_criterias.splitlines()), ratio
             )
         result = priortized_us
+        return jsonify({"result": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/generate-single-ac", methods=["POST"])
+def generate_single_ac():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    ratio = 0.85
+    try:
+        data = request.get_json()
+        userstory = data["body"]
+        print(data["body"])
+        acceptance_criterias = loop.run_until_complete(GenerateFinalAC(userstory))
+        acceptance_criterias = filterSimilarAC(
+            AppendingStoriesFromCUU(acceptance_criterias.splitlines()), ratio
+        )
+        result = acceptance_criterias
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

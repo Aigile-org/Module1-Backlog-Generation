@@ -61,7 +61,7 @@ async def generate_user_stories_with_epics( req):
     "- Epic: <epic> (This epic may encompass multiple related user stories)\n"
     "- Description: Detailed and clear acceptance criteria that define the success of the user story, particularly in achieving MVP functionality and supporting the overall vision.\n"
 ).format(req=req)
-    
+
 #     client = Groq(
 #         api_key="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",
 #     )
@@ -75,7 +75,7 @@ async def generate_user_stories_with_epics( req):
 #     model="llama3-70b-8192",
 #     stream=False,
 # )
-    
+
     # Access the generated content
     try:
         generated_content = await send_to_llm(prompt_content)
@@ -95,15 +95,15 @@ async def generate_user_stories_with_epics( req):
     #     return parsed_stories
     # else:
     #     raise Exception("Failed to process the request with OpenAI: " + response.text)
-    
+
 def generate_check_stories_prompt(stories, framework):
     stories_formatted = ''
-    
+
     for index, story in enumerate(stories):
         if not isinstance(story, dict):
             print(f"Error: Story at index {index} is not a dictionary: {story}")
             continue
-        
+
         # Ensure 'status' key is handled properly
         stories_formatted += (
             # f"- Story ID {index}: "

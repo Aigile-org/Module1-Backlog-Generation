@@ -1,6 +1,5 @@
 # from sentence_transformers import SentenceTransformer
-from transformers import AutoModel, AutoTokenizer
-import torch
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from groq import Groq
 
@@ -13,13 +12,15 @@ async def send_to_llm(prompt,type_=None):
     # # api_key="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"
     # # api_key="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"
     # api_key="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"
-    api_key="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"
+    # Newwww
+    # api_key="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"
+    api_key="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"
     )
     # if type_=="100-dollar":
     model="llama3-70b-8192"
         # model="llama3-70b-8192"
     # else:
-        # model="mixtral-8x7b-32768" 
+        # model="mixtral-8x7b-32768"
     response = client.chat.completions.create(
         messages=prompt,
         model= model,
@@ -52,7 +53,7 @@ def readInstructionFile(filename):
     content = f.read()
     return content
 def constructeInputPromptForACGeneration(us):
-    path="D:/Menna/Module1-Backlog-Generation/python scripts/"
+    path="/home/mou3/mysite/python scripts/"
     usFile, raExample, qaExample, othersExample = readFewshotExamples(path,"1")
     usFile2, raExample2, qaExample2, othersExample2 = readFewshotExamples(path,"2")
     usFile3, raExample3, qaExample3, othersExample3 = readFewshotExamples(path,"3")
@@ -180,26 +181,21 @@ def AppendingStoriesFromCUU(acceptance_criterias):
             continue
     return all_output
 
-def get_bert_embedding(text):
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
-
 def checkSimilarity(sen1, sen2):
     # Encode the sentences into embeddings
-    emb1 = get_bert_embedding(sen1).reshape(1, -1)  # Reshape to 2D for sklearn
-    emb2 = get_bert_embedding(sen2).reshape(1, -1)
-    
-    # Calculate cosine similarity
-    score = cosine_similarity(emb1,emb2)[0][0]
-    
+    # vectorizer = TfidfVectorizer()
+    embeddings = vectorizer.fit_transform([sen1, sen2])  # Must be a list of sentences
+
+    # Convert to dense format for similarity calculation
+    emb1, emb2 = embeddings.toarray()
+
+    # Compute cosine similarity
+    score = cosine_similarity([emb1], [emb2])[0][0]
+
     return score
 # Load the pre-trained sentence transformer model (BERT-based)
 # model = SentenceTransformer('all-MiniLM-L6-v2')
-model_name = "bert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModel.from_pretrained(model_name)
+vectorizer = TfidfVectorizer()
 def filterSimilarAC(ac, ratio):
     finalAC = []
     for i in ac:
