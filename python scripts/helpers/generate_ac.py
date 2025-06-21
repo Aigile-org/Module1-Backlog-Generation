@@ -33,6 +33,7 @@ async def send_to_llm(prompt,type_=None):
     except AttributeError as e:
         print(f"Error parsing response: {e}")
         return None
+    
 def readFewshotExamples(path,id):
 
     usFile = open(path+"Examples/example_"+id+"_US.txt", "r", encoding="utf8")

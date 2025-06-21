@@ -1,0 +1,123 @@
+{
+  "result": [
+    {
+      "description": "The system matches buy and sell orders based on price and time priority, allowing for partial order fulfillment. The system automatically executes trades, provides immediate confirmation, and logs the trade details in the database.",
+      "dollar_allocation": 12,
+      "epic": "Trade Execution",
+      "key": 3,
+      "user_story": "As a trader, I want to execute a trade based on market conditions, in order to buy or sell an asset."
+    },
+    {
+      "description": "The system provides real-time updates on executed trades, including order fills, trade confirmations, and trade cancellations. The updates are delivered to the user via the UI or push notifications.",
+      "dollar_allocation": 10,
+      "epic": "Trade Execution",
+      "key": 4,
+      "user_story": "As a trader, I want to receive real-time trade updates, in order to stay informed about market activity."
+    },
+    {
+      "description": "The system allows users to place a new order with various order types (e.g., market order, limit order, stop-loss order). The user interface guides the user through the order placement process, and the system validates the order against the user's account balance and trading limits. The order is stored in the database, and the user receives confirmation of the order placement.",
+      "dollar_allocation": 8,
+      "epic": "Order Management",
+      "key": 0,
+      "user_story": "As a trader, I want to place a new order, in order to buy or sell an asset."
+    },
+    {
+      "description": "The system provides real-time market data feeds to users, including current prices, order books, and trading volume. The data is delivered via the UI, API, or subscription-based services.",
+      "dollar_allocation": 8,
+      "epic": "Market Data Handling",
+      "key": 5,
+      "user_story": "As a trader, I want to access real-time market data, in order to make informed trading decisions."
+    },
+    {
+      "description": "The system provides trade logging for audit trails, ensuring that all trades are recorded and verified. The system maintains compliance with financial regulations, including reporting mechanisms for suspicious transactions.",
+      "dollar_allocation": 8,
+      "epic": "Regulatory Compliance",
+      "key": 9,
+      "user_story": "As a regulatory body, I want to monitor and audit trade activity, in order to ensure compliance with financial regulations."
+    },
+    {
+      "description": "The system provides pre-trade and post-trade risk analysis, including exposure limits, margin calls, and potential losses. The analysis is delivered to the user via the UI or API, allowing for informed trading decisions.",
+      "dollar_allocation": 8,
+      "epic": "Risk Management",
+      "key": 12,
+      "user_story": "As a trader, I want to receive pre-trade and post-trade risk analysis, in order to make informed trading decisions."
+    },
+    {
+      "description": "The system allows users to modify an existing order, including updating the order quantity, price, and trading strategy. The system validates the changes against the user's account balance and trading limits. The modified order is stored in the database, and the user receives confirmation of the modification.",
+      "dollar_allocation": 6,
+      "epic": "Order Management",
+      "key": 1,
+      "user_story": "As a trader, I want to modify an existing order, in order to adjust the order parameters."
+    },
+    {
+      "description": "The system stores historical trade data, including trade executions, order books, and trading volume. The data is accessible via the UI, API, or custom data queries.",
+      "dollar_allocation": 6,
+      "epic": "Market Data Handling",
+      "key": 6,
+      "user_story": "As a trader, I want to access historical trade data, in order to analyze past market activity."
+    },
+    {
+      "description": "The system allows risk managers to set exposure limits on individual traders and institutions, ensuring that trading risk is managed and controlled. The system enforces the exposure limits, preventing excessive trading activity.",
+      "dollar_allocation": 6,
+      "epic": "Risk Management",
+      "key": 11,
+      "user_story": "As a risk manager, I want to set exposure limits on individual traders and institutions, in order to manage trading risk."
+    },
+    {
+      "description": "The system provides real-time tracking of account balances, trading history, and market value, allowing traders to monitor their portfolio and make informed decisions.",
+      "dollar_allocation": 6,
+      "epic": "Account and Portfolio Management",
+      "key": 13,
+      "user_story": "As a trader, I want to track my account balance and trading history, in order to manage my portfolio."
+    },
+    {
+      "description": "The system provides customizable notifications for executed trades, margin calls, and account activity, ensuring that traders are aware of important market events. The notifications are delivered via email, SMS, or in-app alerts.",
+      "dollar_allocation": 6,
+      "epic": "Notification System",
+      "key": 15,
+      "user_story": "As a trader, I want to receive alerts for executed trades, margin calls, and account activity, in order to stay informed about market activity."
+    },
+    {
+      "description": "The system allows users to cancel an existing order, including withdrawing a partially or fully filled order. The system ensures that the cancellation is processed correctly, and the user receives confirmation of the cancellation.",
+      "dollar_allocation": 5,
+      "epic": "Order Management",
+      "key": 2,
+      "user_story": "As a trader, I want to cancel an existing order, in order to withdraw a previously placed order."
+    },
+    {
+      "description": "The system provides a secure login mechanism with multi-factor authentication, ensuring that only authorized users can access the trading platform. The system logs the user's login attempts and provides access to the user's account.",
+      "dollar_allocation": 4,
+      "epic": "User Authentication and Authorization",
+      "key": 7,
+      "user_story": "As a broker, I want to securely log in to the system, in order to access the trading platform."
+    },
+    {
+      "description": "The system assigns role-based access control to users, ensuring that each user has the necessary permissions to access specific features and data. The system enforces role-based access control, preventing unauthorized access to sensitive information.",
+      "dollar_allocation": 4,
+      "epic": "User Authentication and Authorization",
+      "key": 8,
+      "user_story": "As a trader, I want to be assigned a role-based access control, in order to ensure secure access to the trading platform."
+    },
+    {
+      "description": "The system detects and notifies users of suspicious transactions, ensuring that traders are aware of potential security risks and can take action to mitigate them.",
+      "dollar_allocation": 4,
+      "epic": "Regulatory Compliance",
+      "key": 10,
+      "user_story": "As a trader, I want to receive notifications for suspicious transactions, in order to stay informed about potential security risks."
+    },
+    {
+      "description": "The system allows traders to generate reports on their portfolio performance, including profit and loss, trading volume, and market value. The reports are delivered via the UI or API, providing insights for informed trading decisions.",
+      "dollar_allocation": 4,
+      "epic": "Account and Portfolio Management",
+      "key": 14,
+      "user_story": "As a trader, I want to generate reports on my portfolio performance, in order to analyze trading results."
+    },
+    {
+      "description": "The system allows users to configure notification settings, including notification frequency, filter options, and alert thresholds. The system stores the user's notification settings and applies them to the user's account.",
+      "dollar_allocation": 3,
+      "epic": "Notification System",
+      "key": 16,
+      "user_story": "As a trader, I want to configure notification settings, in order to customize my trading experience."
+    }
+  ]
+}
