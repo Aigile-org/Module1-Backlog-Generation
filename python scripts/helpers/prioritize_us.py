@@ -5,10 +5,6 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from priortization_algos import (
-    estimate_ahp,
-    estimate_kano,
-    estimate_moscow,
-    estimate_wsjf,
     engage_agents_in_prioritization,
     construct_batch_100_dollar_prompt,
     send_to_llm
@@ -23,26 +19,15 @@ def construct_product_owner_prompt(data, client_feedback=None):
         ]
     )
 
-    # feedback_section = ""
-    # if client_feedback:
-    #     feedback_section = "As you prioritize, consider the following feedback provided by the client:\n\n" + '\n'.join(['- ' + fb for fb in client_feedback]) + "\n\n"
+    prompt_file_path = os.path.join(os.path.dirname(__file__), "PO_prompt_content.txt")
+    with open(prompt_file_path, "r", encoding="utf-8") as f:
+        prompt_template = f.read()
 
-    # print("Formatted Stories:")
-    # print(stories_formatted)
-    prompt = (
-        "You are an experienced Product Owner who has successfully delivered several products from concept to market. "
-        # f"{feedback_section}"
-        "Distribute 100 dollars (points) among the following user stories. Each dollar represents the relative importance of that story. "
-        "Please distribute exactly 100 dollars across these stories, making sure the total equals exactly 100 dollars. Each dollar represents the importance of that story.\n"
-        "Ensure the total adds up to 100 dollars. Use this format:\n"
-        "- ID X: Y dollars\n"
-        "- ID Z: W dollars\n\n"
-        "Here are the stories:\n\n"
-        f"{stories_formatted}\n\n"
-        "After allocating, double-check that the total is exactly 100 dollars. If it does not total 100, adjust and verify until it equals exactly 100.\n"
-        "Provide a brief summary of two or three lines, explaining your prioritization approach, focusing on maximizing customer value and aligning with strategic goals."
-    )
-    return prompt
+    # Insert the req into the template
+    prompt_content = prompt_template.format(stories_formatted=stories_formatted)
+
+    print("PO prompt content:", prompt_content)
+    return prompt_content
 
 
 def construct_senior_developer_prompt(data, client_feedback=None):
@@ -53,24 +38,14 @@ def construct_senior_developer_prompt(data, client_feedback=None):
         ]
     )
 
-    # feedback_section = ""
-    # if client_feedback:
-    #     feedback_section = "As you prioritize, take into account the following feedback from the client:\n\n" + '\n'.join(['- ' + fb for fb in client_feedback]) + "\n\n"
-    prompt = (
-        "You are a Senior Developer with several years of programming experience. "
-        # f"{feedback_section}"
-        "Distribute 100 dollars (points) among the following user stories. Each dollar represents the relative importance of that story. "
-        "Please distribute exactly 100 dollars across these stories, making sure the total equals exactly 100 dollars. Each dollar represents the importance of that story.\n"
-        "Ensure the total adds up to 100 dollars. Use this format:\n"
-        "- ID X: Y dollars\n"
-        "- ID Z: W dollars\n\n"
-        "Here are the stories:\n\n"
-        f"{stories_formatted}\n\n"
-        "After allocating, double-check that the total is exactly 100 dollars. If it does not total 100, adjust and verify until it equals exactly 100.\n"
-        "Provide a brief summary of two or three lines,, focusing on technical dependencies, efficient project flow, and best practices."
-    )
-    return prompt
+    prompt_file_path = os.path.join(os.path.dirname(__file__), "SD_prompt_content.txt")
+    with open(prompt_file_path, "r", encoding="utf-8") as f:
+        prompt_template = f.read()
 
+    # Insert the req into the template
+    prompt_content = prompt_template.format(stories_formatted=stories_formatted)
+    print("SD prompt content:", prompt_content)
+    return prompt_content
 
 def construct_senior_qa_prompt(data, client_feedback=None):
     stories_formatted = "\n".join(
@@ -79,25 +54,13 @@ def construct_senior_qa_prompt(data, client_feedback=None):
             for index, story in enumerate(data["stories"])
         ]
     )
-
-    # feedback_section = ""
-    # if client_feedback:
-    #     feedback_section = "As you prioritize, consider the following feedback from the client:\n\n" + '\n'.join(['- ' + fb for fb in client_feedback]) + "\n\n"
-
-    prompt = (
-        "You are a Senior QA professional focused on quality and reliability. "
-        # f"{feedback_section}"
-        "Distribute 100 dollars (points) among the following user stories. Each dollar represents the relative importance of that story. "
-        "Ensure the total adds up to 100 dollars. Use this format:\n"
-        "Please distribute exactly 100 dollars across these stories, making sure the total equals exactly 100 dollars. Each dollar represents the importance of that story.\n"
-        "- ID X: Y dollars\n"
-        "- ID Z: W dollars\n\n"
-        "Here are the stories:\n\n"
-        f"{stories_formatted}\n\n"
-        "After allocating, double-check that the total is exactly 100 dollars. If it does not total 100, adjust and verify until it equals exactly 100.\n"
-        "Provide a brief summary of two or three lines, emphasizing risk mitigation, quality, and client satisfaction."
-    )
-    return prompt
+    prompt_file_path = os.path.join(os.path.dirname(__file__), "QA_prompt_content.txt")
+    with open(prompt_file_path, "r", encoding="utf-8") as f:
+        prompt_template = f.read()
+    prompt_content = prompt_template.format(stories_formatted=stories_formatted)
+    print(stories_formatted)
+    print("QA prompt content:", prompt_content)
+    return prompt_content
 
 async def agents_workflow(
     stories, prioritization_type, client_feedback=None
@@ -132,27 +95,6 @@ async def agents_workflow(
         )
         prioritized_stories = await engage_agents_in_prioritization(
             prioritize_prompt, stories
-        )
-        # print("Final 100 dollar", prioritized_stories)
-        # Order by wsjf_score = (bv + tc + rr_oe) / js if js != 0 else 0  # Prevent division by zero 
-    elif prioritization_type == "WSJF":
-        prioritized_stories = await estimate_wsjf(
-            stories, topic_response, context_response
-        )
-        # Sort by ['Must Have', 'Should Have', 'Could Have', "Won't Have"], 0: highest priority
-    elif prioritization_type == "MOSCOW":
-        prioritized_stories = await estimate_moscow(
-            stories, topic_response, context_response
-        )
-        # Sort by ['Basic Needs', 'Performance Needs', 'Excitement Needs', 'Indifferent', 'Reverse'], 0: highest priority
-    elif prioritization_type == "KANO":
-        prioritized_stories = await estimate_kano(
-            stories,  topic_response, context_response
-        )
-        # Sort by OS where W = (BV + ER + D) / 3, OS = W
-    elif prioritization_type == "AHP":
-        prioritized_stories = await estimate_ahp(
-            {"stories": stories}, topic_response, context_response
         )
     else:
         raise ValueError(f"Unsupported prioritization type: {prioritization_type}")
