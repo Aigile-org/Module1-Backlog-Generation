@@ -1,0 +1,28 @@
+modules:
+  jira:issuePanel:
+    - key: acceptance-criteria-hello-world-issue-panel
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: Acceptance Criteria
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs22.x
+  id: ari:cloud:ecosystem::app/f8c8850a-199a-4095-9c04-aa41cc33c368
+permissions:
+  scopes:
+    - storage:app
+    - read:jira-work
+    - write:jira-work
+  external:
+    fetch:
+      backend:
+        - https://mou3.pythonanywhere.com/*
