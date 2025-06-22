@@ -6,10 +6,8 @@ import json
 # Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from helpers.generate_us import (
-    generate_user_stories_with_epics,
-    check_stories_with_framework,
-)
-from helpers.prioritize_us import agents_workflow
+    generate_user_stories)
+from helpers.prioritize_us import agents
 from helpers.generate_ac import *
 from generate_acceptance_criteria import *
 
@@ -45,7 +43,7 @@ async def pipeline(req):
     # print(req_refined)
     ratio = 0.95
     # 1. Generate User Stories
-    user_stories = await generate_user_stories_with_epics(req=req_refined)
+    user_stories = await generate_user_stories(req=req_refined)
     # print(user_stories)
     # Define the output file path
     # output_file = "user_stories_llama3_8b_8192.py"
@@ -60,7 +58,7 @@ async def pipeline(req):
     # 3. Prioritize User Stories
     while True:
         try:
-            priortized_us = await agents_workflow(user_stories, "AHP")
+            priortized_us = await agents(user_stories, "AHP")
             break
         except AttributeError as e:
             print(f"Error parsing response: {e}")
@@ -101,12 +99,12 @@ def generate_us():
         req_refined = loop.run_until_complete(refine_text(req))
         print("req_refined", req_refined)  
         user_stories = loop.run_until_complete(
-            generate_user_stories_with_epics(req=req_refined)
+            generate_user_stories(req=req_refined)
         )
         while True:
             try:
                 priortized_us = loop.run_until_complete(
-                    agents_workflow(user_stories, "100_DOLLAR")
+                    agents(user_stories, "100_DOLLAR")
                 )
                 break
             except AttributeError as e:

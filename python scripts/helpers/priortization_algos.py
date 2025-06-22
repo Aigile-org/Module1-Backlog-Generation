@@ -1,5 +1,5 @@
 import logging
-from groq import Groq
+from groq import Groq, RateLimitError
 import os
 import re
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ API_KEYS = [
     "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"
 ]
 
-async def send_to_llm(prompt, type_=None):
+async def send_to_llm(prompt):
     """
     Sends a prompt to the Groq LLM API, handling rate limits by cycling through a list of API keys.
     """
@@ -66,7 +66,7 @@ async def send_to_llm(prompt, type_=None):
     print("Could not get a response from the API. All keys are likely exhausted.")
     return None
 #*************100 Dollar**********
-def construct_batch_100_dollar_prompt(data, dev_response, qa_response, po_response):
+def construct_prompt(data, dev_response, qa_response, po_response):
     stories_formatted = '\n'.join([
         f"- Story ID {index + 1}: '{story['user_story']}' {story['epic']} {story['description']}"
         for index, story in enumerate(data['stories'])
@@ -87,15 +87,15 @@ def construct_batch_100_dollar_prompt(data, dev_response, qa_response, po_respon
         dev_response_direct=dev_response,
         po_response_direct=po_response
     )
-    print("Batch 100 Dollar prompt content:", prompt)
+    print("100 Dollar prompt content:", prompt)
     return prompt
 
-async def engage_agents_in_prioritization(prompt, stories, max_retries=20 ):
+async def combining_agents(prompt, stories, max_retries=20):
     logger.info(f"Engaging agents in prioritization with prompt: {prompt}")
     for attempt in range(max_retries):
         try:
-            final_response = await send_to_llm(prompt,"100-dollar")
-            dollar_distribution = parse_100_dollar_response(final_response)
+            final_response = await send_to_llm(prompt)
+            dollar_distribution = parse_response(final_response)
 
             if not dollar_distribution:
                 logger.error(f"Failed to parse dollar distribution: {final_response}")
@@ -103,9 +103,17 @@ async def engage_agents_in_prioritization(prompt, stories, max_retries=20 ):
 
             logger.info(f"Dollar Response: {dollar_distribution}")
 
-            enriched_stories = enrich_stories_with_dollar_distribution(stories, dollar_distribution)
-            # await websocket.send_json({"agentType": "Final Prioritization", "message": {"stories": enriched_stories}})
-            return enriched_stories
+            dollar_dict = {dist['story_id']: dist['dollars'] for dist in dollar_distribution}
+
+            add_to_stories = []
+            for story in stories:
+                story_id = story['key'] + 1
+                story['priority'] = dollar_dict.get(story_id, 0)
+                add_to_stories.append(story)
+
+            # Sort the enriched stories by priority in descending order
+            add_to_stories.sort(key=lambda x: x['priority'], reverse=True)
+            return add_to_stories
 
         except Exception as e:
             logger.error(f"Error during prioritization attempt {attempt + 1}: {str(e)}")
@@ -113,7 +121,7 @@ async def engage_agents_in_prioritization(prompt, stories, max_retries=20 ):
 
     raise Exception("Failed to get valid response from agents after multiple attempts")
 
-def parse_100_dollar_response(response_text):
+def parse_response(response_text):
     pattern = re.compile(r"- Story ID (\d+): .*?(\d+) dollars")
     dollar_distribution = []
 
@@ -126,17 +134,3 @@ def parse_100_dollar_response(response_text):
 
     return dollar_distribution
 
-# Adding dollar allocation to original stories
-def enrich_stories_with_dollar_distribution(original_stories, dollar_distribution):
-    dollar_dict = {dist['story_id']: dist['dollars'] for dist in dollar_distribution}
-
-    enriched_stories = []
-    for story in original_stories:
-        story_id = story['key'] + 1
-        story['dollar_allocation'] = dollar_dict.get(story_id, 0)
-        enriched_stories.append(story)
-
-    # Sort the enriched stories by dollar_allocation in descending order
-    enriched_stories.sort(key=lambda x: x['dollar_allocation'], reverse=True)
-
-    return enriched_stories

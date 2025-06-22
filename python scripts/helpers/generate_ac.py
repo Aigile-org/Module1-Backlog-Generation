@@ -1,7 +1,7 @@
 # from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from groq import Groq
+from groq import Groq, RateLimitError
 
 API_KEYS = [
     "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",

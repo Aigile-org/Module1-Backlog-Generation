@@ -1,18 +1,14 @@
 import sys
 import asyncio
 import re
-
-# from groq import Groq
 import os
 import json
 import os
 import sys
-
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from priortization_algos import *
 
-
-def parse_user_stories(text_response):
+def user_story_parser(text_response):
     # Adjusted pattern to match the structured numbered list format, including the last line without a newline
     pattern = re.compile(
         r"### User Story \d+:\n"
@@ -44,11 +40,9 @@ def parse_user_stories(text_response):
             }
         )
 
-    # return json.dumps(user_stories, indent=4)
     return user_stories
 
-
-async def generate_user_stories_with_epics(req):
+async def generate_user_stories(req):
     # Read prompt template from file
     prompt_file_path = os.path.join(os.path.dirname(__file__), "generate_us_prompt_content.txt")
     with open(prompt_file_path, "r", encoding="utf-8") as f:
@@ -59,18 +53,9 @@ async def generate_user_stories_with_epics(req):
 
     try:
         generated_content = await send_to_llm(prompt_content)
-        parsed_stories = parse_user_stories(generated_content)
+        parsed_stories = user_story_parser(generated_content)
         return parsed_stories
     except AttributeError as e:
         return None
-    # if response.status_code == 200:
-    #     response_data = response.json()
-    #     generated_content = response.choices[0].message.content
-    #     print(generated_content)
-    #     parsed_stories = parse_user_stories(generated_content)
-    #     print(parsed_stories)
-    #     return parsed_stories
-    # else:
-    #     raise Exception("Failed to process the request with OpenAI: " + response.text)
 
 
