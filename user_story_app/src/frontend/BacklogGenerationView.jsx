@@ -1,96 +1,62 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { 
   Stack, 
   TextArea, 
   Button, 
   Text, 
   Box, 
-  InlineEdit, 
-  Textfield,
   SectionMessage,
   Spinner,
-  Heading,
-  Select
+  Heading
 } from "@forge/react";
 import { createJiraIssue } from "./helper";
 import { invoke } from "@forge/bridge";
 
-const InlineEditField = ({ label, value, onChange, type = "text" }) => {
-  return (
-    <Box marginBottom="space.100">
-      <InlineEdit
-        defaultValue={value}
-        label={label}
-        editView={({ errorMessage, ...fieldProps }) => (
-          <Textfield 
-            {...fieldProps} 
-            autoFocus 
-            type={type}
-            placeholder={`Enter ${label.toLowerCase()}...`}
-          />
-        )}
-        readView={() => (
-          <Box
-            padding="space.075"
-            backgroundColor="color.background.input"
-            borderRadius="border.radius"
-            minHeight="32px"
-            display="flex"
-            alignItems="center"
-          >
-            <Text>
-              {value || `Click to edit ${label.toLowerCase()}`}
-            </Text>
-          </Box>
-        )}
-        onConfirm={(value) => onChange(value)}
-      />
-    </Box>
-  );
-};
-
-const PrioritySelect = ({ value, onChange }) => {
-  const priorityOptions = [
-    { label: "Highest", value: "Highest" },
-    { label: "High", value: "High" },
-    { label: "Medium", value: "Medium" },
-    { label: "Low", value: "Low" },
-    { label: "Lowest", value: "Lowest" }
-  ];
-
-  return (
-    <Box marginBottom="space.100">
-      <Text weight="medium" size="small" color="color.text.subtle" marginBottom="space.050">
-        🎯 Priority
-      </Text>
-      <Select
-        options={priorityOptions}
-        value={priorityOptions.find(option => option.value === value)}
-        onChange={(selectedOption) => onChange(selectedOption.value)}
-        placeholder="Select priority..."
-      />
-    </Box>
-  );
-};
-
-// Map priority number to Jira priority strings
-const mapPriority = (priorityNumber, totalStories) => {
-  if (totalStories === 0) return "Medium";
+// Map dollar allocation percentage to Jira priority strings based on relative ranking
+const mapPriorityByRanking = (stories) => {
+  if (!stories || stories.length === 0) return [];
   
-  // Priority number from API (higher numbers = higher priority)
-  const priority = priorityNumber || 0;
-
-  if (priority >= 15) {
-    return "Highest";
-  } else if (priority >= 12) {
-    return "High"; 
-  } else if (priority >= 8) {
-    return "Medium";
-  } else if (priority >= 5) {
-    return "Low";
-  } else {
-    return "Lowest";
-  }
+  // Create array with original index and priority for sorting
+  const storiesWithIndex = stories.map((story, index) => ({
+    originalIndex: index,
+    priority: story.priority || 0
+  }));
+  
+  // Sort by priority (dollar allocation) in descending order
+  storiesWithIndex.sort((a, b) => b.priority - a.priority);
+  
+  // Create a map of original index to priority based on ranking
+  const priorityMap = {};
+  const totalStories = stories.length;
+  
+  storiesWithIndex.forEach((item, rankIndex) => {
+    // Distribute priorities evenly across the range based on rank position
+    if (totalStories === 1) {
+      priorityMap[item.originalIndex] = "Medium";
+    } else {
+      // Calculate the position as a percentage of the total range
+      const position = rankIndex / (totalStories - 1);
+      
+      if (position === 0) {
+        // First item (highest allocation)
+        priorityMap[item.originalIndex] = "Highest";
+      } else if (position === 1) {
+        // Last item (lowest allocation)
+        priorityMap[item.originalIndex] = "Lowest";
+      } else if (position <= 0.25) {
+        // Top 25% of remaining items
+        priorityMap[item.originalIndex] = "High";
+      } else if (position <= 0.75) {
+        // Middle 50% of items
+        priorityMap[item.originalIndex] = "Medium";
+      } else {
+        // Bottom 25% of remaining items (but not the very last)
+        priorityMap[item.originalIndex] = "Low";
+      }
+    }
+  });
+  
+  return priorityMap;
 };
 
 export const BacklogGenerationView = () => {
@@ -98,29 +64,22 @@ export const BacklogGenerationView = () => {
   const [userStories, setUserStories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [addingToBacklog, setAddingToBacklog] = useState({});
-
-  const clearMessages = useCallback(() => {
+  const [successMessage, setSuccessMessage] = useState("");  const [addingToBacklog, setAddingToBacklog] = useState({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState('');
+  const [pollInterval, setPollInterval] = useState(null);
+  const [addingAllToBacklog, setAddingAllToBacklog] = useState(false);const clearMessages = useCallback(() => {
     setError("");
     setSuccessMessage("");
+    setGenerationProgress('');
   }, []);
-  const updateUserStory = useCallback((index, field, value) => {
-    setUserStories(prevStories => 
-      prevStories.map((story, i) => 
-        i === index 
-          ? { ...story, [field]: value }
-          : story
-      )
-    );
-  }, []);
+  
   const validateRequirements = (req) => {
     if (!req || req.trim().length < 10) {
       return "Please provide detailed project requirements (at least 10 characters)";
     }
     return null;
   };
-
   const handleGenerate = async () => {
     clearMessages();
     
@@ -130,56 +89,115 @@ export const BacklogGenerationView = () => {
       return;
     }
 
+    setIsGenerating(true);
     setIsLoading(true);
     setUserStories([]); // Clear previous results
+    setGenerationProgress('Starting user story generation...');
     
     try {
-      console.log('Generating user stories...');
-      const response = await invoke("askGPT", { requirements });      if (response.error) {
-        setError(`Failed to generate user stories: ${response.error}`);
-        return;
-      }      if (response.result && Array.isArray(response.result)) {
-        const mappedStories = response.result.map((story, index) => ({
-          id: index + 1, // Permanent ID that won't change
-          summary: story.user_story || '',
-          description: story.description || '',
-          priority: mapPriority(story.priority || 0, response.result.length),
-          isChecked: false
-        }));setUserStories(mappedStories);
-        setSuccessMessage(`🎉 Successfully generated ${mappedStories.length} user stories!`);
+      // Start generation job
+      const jobResponse = await invoke("startUserStoryGeneration", { requirements });
+      
+      if (jobResponse.jobId) {
+        setGenerationProgress('Generation job started, checking progress...');
+        // Start polling for completion
+        startPolling(jobResponse.jobId);
       } else {
-        setError("Received unexpected response format from the server");
-      }    } catch (error) {
-      console.error("Error generating user stories:", error);
-      
-      // Handle different types of errors gracefully
-      let errorMessage = error.message || error.toString() || 'Unknown error occurred';
-      
-      // Simplify error messages for users
-      if (errorMessage.includes('Task timed out') || errorMessage.includes('timed out')) {
-        errorMessage = 'The AI service is currently busy processing your request. Please try again.';
-      } else if (errorMessage.includes('Network Error') || errorMessage.includes('fetch')) {
-        errorMessage = 'Unable to connect to the AI service. Please check your connection and try again.';
-      } else if (errorMessage.includes('invoking the function')) {
-        errorMessage = 'The AI service is currently unavailable. Please try again in a moment.';
+        setError('Failed to start generation. Please try again.');
+        setIsLoading(false);
+        setIsGenerating(false);
       }
-      
-      setError(`An error occurred while generating user stories: ${errorMessage}`);
-    }finally {
+    } catch (error) {
+      setError('Failed to start generation. Please try again.');
       setIsLoading(false);
+      setIsGenerating(false);
     }
   };
-    const handleAddToBacklog = async (index) => {
+  // Start polling for job completion
+  const startPolling = (jobId) => {
+    let pollAttempts = 0;
+    const maxPollAttempts = 1000000; // Allow up to 1 million attempts (essentially never give up)
+    
+    const interval = setInterval(async () => {
+      try {
+        pollAttempts++;
+        const status = await invoke('checkUserStoryGenerationStatus', { jobId });
+        
+        if (status.completed) {
+          clearInterval(interval);
+          setPollInterval(null);
+            if (status.success && status.data) {            if (status.data.result && Array.isArray(status.data.result)) {
+              // First, create the priority mapping based on relative ranking
+              const priorityMap = mapPriorityByRanking(status.data.result);
+                const mappedStories = status.data.result.map((story, index) => ({
+                storyNumber: index + 1, // Permanent story number assigned at generation
+                summary: story.user_story || '',
+                description: story.description || '',
+                budgetAllocation: story.priority || 0,
+                priority: priorityMap[index] || "Medium",
+                isChecked: false,
+                addedToBacklog: false // Track if story has been added to backlog
+              }));
+
+              setUserStories(mappedStories);
+              setSuccessMessage(`🎉 Successfully generated ${mappedStories.length} user stories!`);
+            } else {
+              setError("Received unexpected response format from the server");
+            }
+          } else {
+            setError(status.error || 'Generation failed. Please try again.');
+          }
+          
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        } else if (status.failed) {
+          clearInterval(interval);
+          setPollInterval(null);
+          setError(status.error || 'Generation failed. Please try again.');
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        } else {
+          // Still in progress
+          const timeElapsed = Math.floor(pollAttempts * 3 / 60); // minutes elapsed
+          const baseProgress = status.progress || 'Generating user stories...';
+          setGenerationProgress(`${baseProgress} (${timeElapsed} min elapsed)`);
+        }
+      } catch (error) {
+        // Don't stop polling on network errors - just update progress to show we're retrying
+        const timeElapsed = Math.floor(pollAttempts * 3 / 60);
+        setGenerationProgress(`Checking status... (${timeElapsed} min elapsed, will keep trying indefinitely)`);
+        
+        // Only stop if we've exceeded the maximum attempts (which is basically never)
+        if (pollAttempts >= maxPollAttempts) {
+          clearInterval(interval);
+          setPollInterval(null);
+          setError('Generation monitoring stopped after maximum attempts.');
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        }
+      }
+    }, 3000); // Poll every 3 seconds
+    
+    setPollInterval(interval);
+  };
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [pollInterval]);  const handleAddToBacklog = async (index) => {
     clearMessages();
     const story = userStories[index];
-    
-    if (!story.summary || !story.description) {
-      setError("Please ensure the user story has both a summary and description before adding to backlog");
-      return;
-    }
 
     setAddingToBacklog(prev => ({ ...prev, [index]: true }));
-      try {
+    
+    try {
       const issueData = {
         summary: story.summary,
         description: story.description,
@@ -189,18 +207,72 @@ export const BacklogGenerationView = () => {
       const result = await createJiraIssue(issueData);
 
       if (result.success) {
-        setUserStories(prevStories => prevStories.filter((_, i) => i !== index));
-        setSuccessMessage(`Successfully added "${story.summary}" to backlog!`);
+        // Mark story as added to backlog instead of removing it
+        setUserStories(prevStories => 
+          prevStories.map((s, i) => 
+            i === index ? { ...s, addedToBacklog: true } : s
+          )
+        );
+        setSuccessMessage(`Successfully added "Story #${story.storyNumber}" to backlog!`);
       } else {
         setError(`Failed to create Jira issue: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error adding to backlog:", error);
-      setError(`An error occurred while adding to backlog: ${error.message}`);
-    } finally {
+      }    } catch (error) {
+      setError('An error occurred while adding to backlog. Please try again.');    } finally {
       setAddingToBacklog(prev => ({ ...prev, [index]: false }));
     }
-  };  return (
+  };
+
+  const handleAddAllToBacklog = async () => {
+    clearMessages();
+    setAddingAllToBacklog(true);
+    
+    try {
+      const storiesToAdd = userStories.filter(story => !story.addedToBacklog);
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < storiesToAdd.length; i++) {
+        const storyIndex = userStories.findIndex(s => s === storiesToAdd[i]);
+        const story = storiesToAdd[i];
+        
+        try {
+          const issueData = {
+            summary: story.summary,
+            description: story.description,
+            priority: story.priority || "Medium",
+          };
+
+          const result = await createJiraIssue(issueData);
+
+          if (result.success) {
+            // Mark story as added to backlog
+            setUserStories(prevStories => 
+              prevStories.map((s, idx) => 
+                idx === storyIndex ? { ...s, addedToBacklog: true } : s
+              )
+            );
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      if (successCount > 0 && failCount === 0) {
+        setSuccessMessage(`🎉 Successfully added all ${successCount} user stories to backlog!`);
+      } else if (successCount > 0 && failCount > 0) {
+        setSuccessMessage(`Added ${successCount} stories to backlog. ${failCount} failed - please try again for those.`);
+      } else {
+        setError('Failed to add stories to backlog. Please try again.');
+      }
+    } catch (error) {
+      setError('An error occurred while adding stories to backlog. Please try again.');
+    } finally {
+      setAddingAllToBacklog(false);
+    }
+  };return (
     <Box
       maxWidth="1200px"
       margin="0 auto"
@@ -239,7 +311,7 @@ export const BacklogGenerationView = () => {
                     <Text weight="bold" size="large">Project Requirements</Text>
                   </Box>
                   <TextArea
-                    placeholder="Example: 'Build an e-commerce platform for small businesses with inventory management, payment processing, customer accounts, and order tracking.'"
+                    placeholder="Example: 'Build an e-commerce platform for small businesses with inventory management, payment processing, customer accounts, and order tracking. Must integrate with existing accounting software and support mobile devices.'"
                     value={requirements}
                     onChange={(e) => setRequirements(e.target.value)}
                     isInvalid={!!error && error.includes("requirements")}
@@ -255,8 +327,7 @@ export const BacklogGenerationView = () => {
                   </Box>
                 </Stack>
               </Box>
-              
-              <Button 
+                <Button 
                 appearance="primary" 
                 onClick={handleGenerate} 
                 isDisabled={isLoading || !requirements.trim()}
@@ -264,13 +335,31 @@ export const BacklogGenerationView = () => {
                 size="large"
               >
                 {isLoading ? "🤖 Generating User Stories..." : "✨ Generate User Stories"}
-              </Button>              {/* Stats Section */}
+              </Button>              {/* Progress Message */}
+              {isGenerating && generationProgress && (
+                <Box
+                  padding="space.200"
+                  backgroundColor="color.background.information.subtlest"
+                  borderRadius="space.100"
+                  textAlign="center"
+                >
+                  <Stack space="space.100">
+                    <Text color="color.text.information" size="small">
+                      {generationProgress}
+                    </Text>
+                    {generationProgress.includes('Generation job started') && (
+                      <Text color="color.text.subtle" size="small">
+                        This may take a few minutes for complex requirements...
+                      </Text>
+                    )}
+                  </Stack>
+                </Box>
+              )}{/* Stats Section */}
             </Stack>
           </Box>          {/* Right Column - User Stories Section */}
           {userStories.length > 0 && (
             <Box>
-              <Stack space="space.100">
-                <Box
+              <Stack space="space.100">                <Box
                   display="flex"
                   justifyContent="space-between"
                   alignItems="center"
@@ -279,7 +368,20 @@ export const BacklogGenerationView = () => {
                   borderRadius="space.100"
                 >
                   <Heading size="large">📋 Generated User Stories</Heading>
-
+                  <Button
+                    appearance="primary"
+                    size="medium"
+                    onClick={handleAddAllToBacklog}
+                    isDisabled={addingAllToBacklog || userStories.every(story => story.addedToBacklog)}
+                    iconAfter={addingAllToBacklog ? <Spinner size="small" /> : undefined}
+                  >
+                    {addingAllToBacklog 
+                      ? "🚀 Adding All..." 
+                      : userStories.every(story => story.addedToBacklog)
+                        ? "✅ All Added"
+                        : "📥 Add All to Backlog"
+                    }
+                  </Button>
                 </Box>
                 
                 <Stack space="space.200">                  {userStories.map((story, index) => (
@@ -298,40 +400,66 @@ export const BacklogGenerationView = () => {
                           alignItems="center"
                           paddingBottom="space.100"
                         >
-                          <Text weight="bold" color="color.text.subtle">Story #{story.id}</Text>
+                          <Text weight="bold" color="color.text.subtle">Story #{story.storyNumber}</Text>
+                        </Box>                        {/* Story Content */}
+                        <Box marginBottom="space.200">
+                          <Text weight="bold" size="medium" color="color.text.accent.blue">
+                            📝 User Story
+                          </Text>
+                          <Box
+                            padding="space.200"
+                            backgroundColor="color.background.input"
+                            borderRadius="border.radius"
+                            marginTop="space.100"
+                          >
+                            <Text>{story.summary}</Text>
+                          </Box>
                         </Box>
 
-                        {/* Editable Fields */}
-                        <InlineEditField 
-                          label="📝 User Story" 
-                          value={story.summary} 
-                          onChange={(newValue) => updateUserStory(index, 'summary', newValue)} 
-                        />
-                          <InlineEditField 
-                          label="📄 Description" 
-                          value={story.description} 
-                          onChange={(newValue) => updateUserStory(index, 'description', newValue)} 
-                        />
-                        
-                        <PrioritySelect
-                          value={story.priority}
-                          onChange={(newValue) => updateUserStory(index, 'priority', newValue)}
-                        />
+                        <Box marginBottom="space.200">
+                          <Text weight="bold" size="medium" color="color.text.accent.blue">
+                            📄 Description
+                          </Text>
+                          <Box
+                            padding="space.200"
+                            backgroundColor="color.background.input"
+                            borderRadius="border.radius"
+                            marginTop="space.100"
+                          >
+                            <Text>{story.description}</Text>
+                          </Box>
+                        </Box>                        <Box marginBottom="space.200">
+                          <Text weight="bold" size="medium" color="color.text.accent.blue">
+                            🎯 Priority
+                          </Text>
+                          <Box
+                            padding="space.200"
+                            backgroundColor="color.background.input"
+                            borderRadius="border.radius"
+                            marginTop="space.100"
+                          >
+                            <Text> {story.priority} priority</Text>
+                          </Box>
+                        </Box>
                           {/* Action Button */}
                         <Box
                           display="flex"
                           justifyContent="center"
                           marginTop="space.200"
                           paddingTop="space.200"
-                        >
-                          <Button 
-                            appearance="primary"
+                        >                          <Button 
+                            appearance={story.addedToBacklog ? "subtle" : "primary"}
                             size="large"
-                            isDisabled={addingToBacklog[index] || !story.summary || !story.description}
+                            isDisabled={addingToBacklog[index] || story.addedToBacklog}
                             onClick={() => handleAddToBacklog(index)}
                             iconAfter={addingToBacklog[index] ? <Spinner size="small" /> : undefined}
                           >
-                            {addingToBacklog[index] ? "🚀 Adding to Backlog..." : "Add to Jira Backlog"}
+                            {story.addedToBacklog 
+                              ? "✅ Added to Backlog" 
+                              : addingToBacklog[index] 
+                                ? "🚀 Adding to Backlog..." 
+                                : "Add to Jira Backlog"
+                            }
                           </Button>
                         </Box>
                       </Stack>                    </Box>

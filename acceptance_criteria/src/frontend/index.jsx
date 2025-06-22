@@ -24,11 +24,14 @@ const App = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState('');
+  const [pollInterval, setPollInterval] = useState(null);
 
   // Helper function to clear messages
   const clearMessages = () => {
     setError('');
     setSuccessMessage('');
+    setGenerationProgress('');
   };
 
   // Calculate completion progress
@@ -68,7 +71,7 @@ const App = () => {
   // Fetch stored Acceptance Criteria from the backend
   const fetchStoredACs = async () => {
     try {
-      const storedACs = await invoke('get-all', { userStory: issueSummary });
+      const storedACs = await invoke('get-all', { issueKey: key });
       if (!storedACs || storedACs.length === 0) {
         generateACs();
       } else {
@@ -84,7 +87,7 @@ const App = () => {
   // Check if Acceptance Criteria have already been generated
   const checkIfGenerated = async () => {
     try {
-      const generatedFlag = await invoke('is-generated', { userStory: issueSummary });
+      const generatedFlag = await invoke('is-generated', { issueKey: key });
       setIsGenerated(generatedFlag);
     } catch (error) {
       // Silently fail for generated flag check
@@ -98,38 +101,109 @@ const App = () => {
     clearMessages();
     setIsGenerating(true);
     setIsLoading(true);
+    setGenerationProgress('Starting generation...');
     
     try {
-      const response = await invoke('getAcceptanceCriteria', { userStory: issueSummary });
-      if (response.error) {
-        setError('Failed to generate acceptance criteria. Please try again.');
-        return;
-      }
-
-      const newACs = response.filter(ac => !ACs.some(existingAC => existingAC.text === ac.text));
-
-      if (newACs.length > 0) {
-        setACs(newACs);
-        await storeACs(newACs);
-        await markAsGenerated();
-        setSuccessMessage(`Successfully generated ${newACs.length} acceptance criteria!`);
-        setIsGenerated(true);
+      // Start generation job
+      const jobResponse = await invoke('startGeneration', { 
+        userStory: issueSummary, 
+        issueKey: key 
+      });
+      
+      if (jobResponse.jobId) {
+        setGenerationProgress('Generation job started, checking progress...');
+        // Start polling for completion
+        startPolling(jobResponse.jobId);
       } else {
-        setError('No new acceptance criteria were generated.');
+        setError('Failed to start generation. Please try again.');
+        setIsLoading(false);
+        setIsGenerating(false);
       }
-
     } catch (error) {
-      // Don't log timeout or other technical errors to avoid exposing them
-      setError('Failed to generate acceptance criteria. Please try again.');
-    } finally {
+      setError('Failed to start generation. Please try again.');
       setIsLoading(false);
       setIsGenerating(false);
     }
   };
 
+  // Start polling for job completion
+  const startPolling = (jobId) => {
+    let pollAttempts = 0;
+    const maxPollAttempts = 1000000; // Allow up to 1 million attempts (essentially never give up)
+    
+    const interval = setInterval(async () => {
+      try {
+        pollAttempts++;
+        const status = await invoke('checkGenerationStatus', { jobId, issueKey: key });
+        
+        if (status.completed) {
+          clearInterval(interval);
+          setPollInterval(null);
+          
+          if (status.success && status.data) {
+            const newACs = status.data.filter(ac => !ACs.some(existingAC => existingAC.text === ac.text));
+            
+            if (newACs.length > 0) {
+              setACs(newACs);
+              await storeACs(newACs);
+              await markAsGenerated();
+              setSuccessMessage(`Successfully generated ${newACs.length} acceptance criteria!`);
+              setIsGenerated(true);
+            } else {
+              setError('No new acceptance criteria were generated.');
+            }
+          } else {
+            setError(status.error || 'Generation failed. Please try again.');
+          }
+          
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        } else if (status.failed) {
+          clearInterval(interval);
+          setPollInterval(null);
+          setError(status.error || 'Generation failed. Please try again.');
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        } else {
+          // Still in progress
+          const timeElapsed = Math.floor(pollAttempts * 3 / 60); // minutes elapsed
+          const baseProgress = status.progress || 'Generating acceptance criteria...';
+          setGenerationProgress(`${baseProgress} (${timeElapsed} min elapsed)`);
+        }
+      } catch (error) {
+        // Don't stop polling on network errors - just update progress to show we're retrying
+        const timeElapsed = Math.floor(pollAttempts * 3 / 60);
+        setGenerationProgress(`Checking status... (${timeElapsed} min elapsed, will keep trying indefinitely)`);
+        
+        // Only stop if we've exceeded the maximum attempts (which is basically never)
+        if (pollAttempts >= maxPollAttempts) {
+          clearInterval(interval);
+          setPollInterval(null);
+          setError('Generation monitoring stopped after maximum attempts.');
+          setIsLoading(false);
+          setIsGenerating(false);
+          setGenerationProgress('');
+        }
+      }
+    }, 3000); // Poll every 3 seconds
+    
+    setPollInterval(interval);
+  };
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [pollInterval]);
+
   const storeACs = async (newACs) => {
     try {
-      await invoke('storeACs', { newACs });
+      await invoke('storeACs', { newACs, issueKey: key });
     } catch (error) {
       // Silently fail for storage operations
     }
@@ -138,7 +212,7 @@ const App = () => {
   // Mark the ACs as generated in the backend
   const markAsGenerated = async () => {
     try {
-      await invoke('mark-generated', { userStory: issueSummary });
+      await invoke('mark-generated', { issueKey: key });
     } catch (error) {
       // Silently fail for marking operations
     }
@@ -262,8 +336,13 @@ const App = () => {
             <Stack space="space.150" alignItems="center">
               <Spinner size="medium" />
               <Text size="small" color="color.text.subtle">
-                Generating criteria...
+                {generationProgress || 'Generating criteria...'}
               </Text>
+              {isGenerating && (
+                <Text size="small" color="color.text.subtlest">
+                  This may take a few minutes. Please wait...
+                </Text>
+              )}
             </Stack>
           </Box>
         )}
