@@ -6,74 +6,48 @@ import re
 # creates a logger instance that is specific to this file
 logger = logging.getLogger(__name__)
 
-API_KEYS = [
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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"
-]
+api_key = "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"
 
 async def send_to_llm(prompt):
-    """
-    Sends a prompt to the Groq LLM API, handling rate limits by cycling through a list of API keys.
-    """
     # llama3: This is the model family, Llama 3 from Meta AI
     # 70b: This refers to the number of parameters—70 billion parameters, which is a measure of the model's size and complexity.
     # 8192: context window size, meaning the model can consider up to 8192 "tokens"
     # context window size: total, combined limit for both the past context (input) and the future generation (output) added together. The more space input takes, the less space is left for the output
-    model = "llama3-70b-8192"
+    model = "llama-3.3-70b-versatile"
     
-    # Iterate through the list of available API keys
-    for i, api_key in enumerate(API_KEYS):
-        try:
-            print(f"Attempting API call with key #{i + 1}...")
-            client = Groq(api_key=api_key)
-            
-            response = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
-                model= model,
-                # 'stream=False' means we will wait for the entire response to be generated
-                # before the function continues. If 'stream=True', we would get the response
-                # back in small chunks as it's being generated.
-                stream=False,
-            )
-            
-            # If the request is successful, return the output
-            print(f"Success with key #{i + 1}.")
-            output = response.choices[0].message.content
-            return output
-            
-        except RateLimitError as e:
-            # This block catches the specific rate limit error
-            # e.body' often contains a JSON object with details
-            print(f"Rate limit reached for key #{i + 1}. Error details: {e.body.get('error', {}).get('message')}")
-            if i < len(API_KEYS) - 1:
-                print("Switching to the next API key.")
-            else:
-                print("All API keys have been rate-limited.")
-            # The loop will continue to the next key
-            
-        except Exception as e:
-            # Catch other potential exceptions (e.g., authentication, connection errors)
-            print(f"An unexpected error occurred with key #{i + 1}: {e}")
-            if i < len(API_KEYS) - 1:
-                print("Trying next key...")
-            else:
-                print("All keys failed.")
+    try:
+        print(f"Attempting API call with primary key...")
+        client = Groq(api_key=api_key)
+        
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model= model,
+            # 'stream=False' means we will wait for the entire response to be generated
+            # before the function continues. If 'stream=True', we would get the response
+            # back in small chunks as it's being generated.
+            stream=False,
+        )
+        
+        # If the request is successful, return the output
+        print(f"Success with primary key")
+        output = response.choices[0].message.content
+        return output
+        
+    except RateLimitError as e:
+        # This block catches the specific rate limit error
+        # e.body' often contains a JSON object with details
+        print(f"Rate limit reached for key. Error details: {e.body.get('error', {}).get('message')}")
+        
+    except Exception as e:
+        # Catch other potential exceptions (e.g., authentication, connection errors)
+        print(f"An unexpected error occurred: {e}")
                 
-    # If the loop completes without a successful call, return None
-    print("Could not get a response from the API. All keys are likely exhausted.")
+    print("Could not get a response from the API.")
     return None
 
 #*************100 Dollar**********
