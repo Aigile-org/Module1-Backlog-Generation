@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from priortization_helpers import *
 
 def user_story_parser(text_response):
-    # Adjusted pattern to match the structured numbered list format
+    # pattern to match the structured numbered list format
     # r means it's a raw string
     pattern = re.compile(
         r"### User Story \d+:\n"
@@ -15,8 +15,8 @@ def user_story_parser(text_response):
         r"- User Story: (.*?)\n" 
         r"- Epic: (.*?)\n"
         # to know where the description ends: use lookahead where newline followed by the next story's header
-        # OR the absolute end of the entire string (\Z) OR a final newline (\n) as a fallback
-        r"- Description: (.*?)(?=\n### User Story \d+:|\Z|\n)",
+        # OR the absolute end of the entire string (\Z) 
+        r"- Description: (.*?)(?=\n### User Story \d+:|\Z)",
         # The 're.DOTALL' flag allows the '.' special character in regex to match any character
         # INCLUDING a newline. Without this, the '.*?' for the description would stop
         # at the end of its first line (won't handle multi line descriptions)

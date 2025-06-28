@@ -11,8 +11,9 @@ api_key = "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"
 async def send_to_llm(prompt):
     # llama3: This is the model family, Llama 3 from Meta AI
     # 70b: This refers to the number of parameters—70 billion parameters, which is a measure of the model's size and complexity.
-    # 8192: context window size, meaning the model can consider up to 8192 "tokens"
-    # context window size: total, combined limit for both the past context (input) and the future generation (output) added together. The more space input takes, the less space is left for the output
+    # 131,072: context window size, meaning the model can consider up to 131,072 "tokens"
+    # context window size: total, combined limit for both the past context (input) and the future generation (output) added together. 
+    # The more space input takes, the less space is left for the output
     model = "llama-3.3-70b-versatile"
     
     try:

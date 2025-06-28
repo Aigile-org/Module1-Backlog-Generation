@@ -59,7 +59,7 @@ def generate_us():
                 print(f"Error parsing response: {e}")
         result = priortized_us
         # 'jsonify' converts the Python dictionary into a proper JSON HTTP response
-        # with the correct 'Content-Type' header.
+        # with the correct 'Content-Type' header
         return jsonify({"result": result})
     except Exception as e:
         # If any error occurs, return a JSON error message with a 500 server error status code
