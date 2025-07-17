@@ -6,7 +6,7 @@ import re
 # creates a logger instance that is specific to this file
 logger = logging.getLogger(__name__)
 
-api_key = "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"
+api_key = ""
 
 async def send_to_llm(prompt):
     # llama3: This is the model family, Llama 3 from Meta AI
