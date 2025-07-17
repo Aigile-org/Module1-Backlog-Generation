@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from groq import Groq, RateLimitError
 
-api_key = "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"
+api_key = ""
 
 async def send_to_llm(prompt, type_=None):
     """
